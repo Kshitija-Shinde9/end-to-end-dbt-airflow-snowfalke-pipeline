@@ -94,6 +94,14 @@ weather-forecasting-airflow-snowflake/
 
 ---
 
+## Pipeline Details
+
+| Pipeline | DAG Name | Schedule | Description |
+|----------|----------|----------|------------|
+| Pipeline 1 | WeatherData_ETL | 02:30 UTC (Daily) | Extracts 60-day weather data from Open-Meteo API, transforms JSON, and loads into Snowflake RAW schema using MERGE (idempotent). |
+| Pipeline 2 | TrainPredict | 03:30 UTC (Daily) | Trains Snowflake ML Forecast model and generates 7-day temperature predictions with confidence intervals. |
+| Pipeline 3 | WeatherData_DBT | 04:30 UTC (Daily) | Runs dbt models, tests, and snapshots to transform raw data into analytics-ready tables. |
+
 ## Pipeline 1 — Weather ETL DAG
 
 **DAG ID:** `WeatherData_ETL`
