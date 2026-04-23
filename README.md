@@ -24,8 +24,10 @@
 - [How to Run](#how-to-run)
 - [Airflow Setup](#airflow-setup)
 - [Preset Dashboard](#preset-dashboard)
+- [Conclusion](#conclusion)
+- [Future Work](#future-work)
 - [Lessons Learned](#lessons-learned)
-
+  
 ---
 
 ## Overview
@@ -781,6 +783,34 @@ Shows the full temperature distribution (median, IQR, whiskers, outliers) of `TE
 A pivot table showing `AVG(PRECIPITATION_MM)` and `AVG(TEMP_MAX)` per city per month (Jan–Apr 2026). Green shading highlights high precipitation; red shading highlights high temperature. Newport Beach records near-zero precipitation every month (0.03–0.98mm average) while Boston and Seattle are consistently greener. Temperatures warm visibly from January through April for Boston and Seattle.
 
 <img width="1232" height="672" alt="image" src="https://github.com/user-attachments/assets/4e7411d7-1c46-42f0-a669-df87ab2f2d5a" />
+
+---
+
+## Conclusion
+
+This project demonstrates the successful implementation of a fully automated end-to-end weather analytics pipeline using modern data engineering tools. The system integrates data ingestion, transformation, machine learning, and visualization into a unified workflow.
+
+Apache Airflow is used to orchestrate multiple pipelines, ensuring a structured and reliable flow of data from source to analytics. The ETL pipeline ingests historical weather data into Snowflake, while dbt enables modular and scalable transformations with built-in testing and validation. In addition, the ML forecasting pipeline leverages Snowflake ML capabilities to generate future temperature predictions, enhancing the analytical value of the system.
+
+The integration of Preset dashboards provides an interactive interface for visualizing insights such as temperature trends, anomalies, and precipitation patterns. Overall, the system ensures data consistency, automation, and reproducibility, making it suitable for real-world analytical applications.
+
+This project highlights how combining data engineering, analytics, and machine learning in a single pipeline can deliver meaningful and actionable insights efficiently.
+
+---
+
+## Future Work
+
+While the current system meets its core objectives, there are several opportunities for improvement and extension.
+
+One potential enhancement is to expand data sources beyond the Open-Meteo API by integrating additional providers or real-time streaming data. This would improve data reliability and scalability. The system can also be extended to include more cities or global-level analytics.
+
+The machine learning pipeline can be further improved by incorporating advanced time-series forecasting models such as LSTM or Prophet to increase prediction accuracy. Additionally, implementing model monitoring and tracking evaluation metrics over time would strengthen the reliability of predictions.
+
+From a system design perspective, introducing CI/CD pipelines for dbt and Airflow would improve deployment efficiency and maintainability. Adding alerting and monitoring mechanisms, such as failure notifications and data quality checks, would make the system more production-ready.
+
+Finally, the visualization layer can be enhanced by adding more interactive dashboards, user-driven filters, and business-focused KPIs to provide deeper and more actionable insights.
+
+These improvements would help evolve the current system into a more scalable, robust, and production-grade data platform.
 
 ---
 
