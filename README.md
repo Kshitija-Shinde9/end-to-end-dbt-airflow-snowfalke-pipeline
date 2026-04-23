@@ -6,6 +6,7 @@
 
 ## Table of Contents
 - [Overview](#overview)
+- [Tech Stack](#tech-stack)
 - [System Architecture](#system-architecture)
 - [Cities Tracked](#cities-tracked)
 - [Project Structure](#project-structure)
