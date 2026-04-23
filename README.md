@@ -37,6 +37,7 @@ Three DAGs handle the three stages of work in sequence:
 
 ## System Architecture
 
+
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/4492b0ab-6128-4f8f-bfcc-c2bf3c122180" />
 
 > **Architecture Overview:**
@@ -146,19 +147,26 @@ VALUES (s.CITY, s.LATITUDE)
 
 Snowflake credentials are stored in an **Airflow Connection** (`snowflake_conn`) — no hardcoded passwords.
 
+### Connections
 
-City configurations are stored as an **Airflow Variable** (JSON):
+Configure in **Admin → Connections:**
 
-```json
-[
-  {"city": "Miami",         "lat": 25.7617,  "lon": -80.1918},
-  {"city": "Newport Beach", "lat": 33.6189,  "lon": -117.9289},
-  {"city": "Seattle",       "lat": 47.6062,  "lon": -122.3321},
-  {"city": "Boston",        "lat": 42.3601,  "lon": -71.0589}
-]
-```
+| Conn ID | Type | Description |
+|---------|------|-------------|
+| `snowflake_conn` | Snowflake | Points to `USER_DB_FERRET`, schema `RAW` |
 
-> Set via **Admin → Variables → `weather_cities`** in the Airflow UI
+<img width="1710" height="949" alt="image" src="https://github.com/user-attachments/assets/47ce4c20-2706-4336-9fa2-e6556adc48d4" />
+
+
+### Variables
+
+Configure in **Admin → Variables:**
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `weather_cities` | JSON | List of city objects with `city`, `lat`, `lon` |
+
+<img width="1710" height="949" alt="image" src="https://github.com/user-attachments/assets/9f98c63a-f52f-40d4-947d-d55415d8dba1" />
 
 ---
 
@@ -168,8 +176,8 @@ City configurations are stored as an **Airflow Variable** (JSON):
 **Schedule:** `30 3 * * *` (Daily at 03:30 UTC — runs after ETL)
 **File:** `dags/weather_prediction.py`
 
-<!-- Screenshot: TrainPredict DAG graph — train > predict both success -->
-<!-- <img width="1710" height="953" alt="TrainPredict DAG graph" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1246" height="662" alt="image" src="https://github.com/user-attachments/assets/87b6a705-214b-4b8c-8282-e6402605d098" />
+
 
 ### How It Works
 
@@ -219,8 +227,7 @@ FROM ADHOC.CITY_WEATHER_FORECAST
 **Schedule:** `30 4 * * *` (Daily at 04:30 UTC — runs after TrainPredict)
 **File:** `dags/weather_dbt_dag.py`
 
-<!-- Screenshot: WeatherData_DBT DAG graph — dbt_run > dbt_test > dbt_snapshot all green -->
-<!-- <img width="1710" height="953" alt="WeatherData_DBT DAG graph" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1242" height="748" alt="image" src="https://github.com/user-attachments/assets/548827e2-7368-4515-a1a1-6601f6deeaaa" />
 
 ### How It Works
 
@@ -258,8 +265,18 @@ dbt_run = BashOperator(
 
 The dbt project (`weather_analytics`) contains **4 analytical models**, all materialized as tables in the `DBT` schema of `USER_DB_FERRET`.
 
-<!-- Screenshot: dbt run output — 4 models SUCCESS in Docker terminal -->
-<!-- <img width="1710" height="600" alt="dbt run output" src="YOUR_SCREENSHOT_URL" /> -->
+dbt run:
+
+<img width="1260" height="310" alt="image" src="https://github.com/user-attachments/assets/da725070-da20-44fb-ab3c-bc8652f82a88" />
+
+dbt test:
+
+<img width="1246" height="776" alt="image" src="https://github.com/user-attachments/assets/ca1b44e6-bd76-43a6-aea0-1c4d6de3b8fe" />
+
+dbt snapshots:
+
+<img width="1246" height="646" alt="image" src="https://github.com/user-attachments/assets/29ca685d-f028-41fd-af5e-d7d398ddec7b" />
+
 
 ### `moving_avg` — 7-Day Rolling Temperature Averages
 
@@ -290,8 +307,7 @@ AVG(TEMP_MAX) OVER (
 | `TEMP_MEAN_7DAY_AVG` | FLOAT | 7-day rolling avg of TEMP_MEAN |
 | `ROLLING_WINDOW_DAYS` | DECIMAL | Days included in the rolling window |
 
-<!-- Screenshot: Preset — moving_avg dataset columns confirmed -->
-<!-- <img width="1710" height="800" alt="moving_avg dataset in Preset" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1248" height="690" alt="image" src="https://github.com/user-attachments/assets/59613b07-b031-4244-9212-a7970f1ef5ee" />
 
 ---
 
@@ -328,8 +344,7 @@ city_averages AS (
 | `TEMP_MEAN_ANOMALY` | FLOAT | Deviation of TEMP_MEAN from city average |
 | `ANOMALY_CATEGORY` | VARCHAR | Above Normal / Below Normal / Near Normal |
 
-<!-- Screenshot: Preset — temp_anomaly dataset columns confirmed -->
-<!-- <img width="1710" height="800" alt="temp_anomaly dataset in Preset" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1234" height="686" alt="image" src="https://github.com/user-attachments/assets/ef64e46c-99b1-4639-9645-db7b998a24c1" />
 
 ---
 
@@ -354,8 +369,7 @@ Calculates both a 7-day and 30-day rolling sum of precipitation per city, plus a
 | `PRECIP_30DAY_ROLLING_SUM` | FLOAT | 30-day rolling total precipitation |
 | `PERIOD_LABEL` | VARCHAR | Wet Period / Normal Period / Dry Period |
 
-<!-- Screenshot: Preset — rolling_precip dataset columns confirmed -->
-<!-- <img width="1710" height="800" alt="rolling_precip dataset in Preset" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1238" height="690" alt="image" src="https://github.com/user-attachments/assets/6dd7e58c-8c22-46b1-97fa-3f4307211986" />
 
 ---
 
@@ -378,8 +392,7 @@ Tracks consecutive dry days (precipitation = 0) per city. Uses a running `SUM(IS
 | `DRY_SPELL_LABEL` | VARCHAR | Rain Day / Dry (1-2 days) / Short Dry Spell (3-6 days) / Extended Dry Spell (7+ days) |
 | `MAX_DRY_SPELL_SO_FAR` | DECIMAL | Running maximum dry spell days for this city |
 
-<!-- Screenshot: Preset — dry_spell dataset columns confirmed -->
-<!-- <img width="1710" height="800" alt="dry_spell dataset in Preset" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1236" height="690" alt="image" src="https://github.com/user-attachments/assets/00cc1170-bbf6-492a-a88a-c3da4fe37031" />
 
 ---
 
@@ -393,8 +406,8 @@ Tests are defined in `models/schema.yml` and cover every model. Each model has:
 - `accepted_values` tests on `CITY` confirming only the 4 expected cities are present
 - Source-level `not_null` tests on `RAW.CITY_WEATHER`
 
-<!-- Screenshot: dbt test output — all 30 PASS in terminal -->
-<!-- <img width="1710" height="860" alt="dbt test 30/30 pass" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1244" height="780" alt="image" src="https://github.com/user-attachments/assets/05534086-ab46-4649-b47b-91c36163f9eb" />
+
 
 ### dbt Snapshot — SCD Type 2 History
 
@@ -417,8 +430,10 @@ FROM {{ source('raw', 'city_weather') }}
 {% endsnapshot %}
 ```
 
-<!-- Screenshot: dbt snapshot output — 1 snapshot SUCCESS in terminal -->
-<!-- <img width="1710" height="400" alt="dbt snapshot success" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1258" height="192" alt="image" src="https://github.com/user-attachments/assets/6514ea99-1b62-4b88-bb5d-ac1b33216c04" />
+
+<img width="1252" height="650" alt="image" src="https://github.com/user-attachments/assets/69d899e3-094a-4e25-b85c-86c12b83729a" />
+
 
 ---
 
@@ -444,8 +459,7 @@ USER_DB_FERRET
     └── CITY_WEATHER_MODEL_METRICS      ← Snowflake ML evaluation metrics
 ```
 
-<!-- Screenshot: Snowflake — SHOW TABLES in DBT schema showing all 5 tables -->
-<!-- <img width="1710" height="500" alt="Snowflake DBT schema tables" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="3418" height="1016" alt="image" src="https://github.com/user-attachments/assets/6d61dd27-6f51-4a86-b022-16b901765474" />
 
 ### `RAW.CITY_WEATHER` — Source Table
 
@@ -466,23 +480,19 @@ USER_DB_FERRET
 
 ### `DBT.MOVING_AVG` — Verified in Snowflake (436 rows)
 
-<!-- Screenshot: Snowflake — SELECT * FROM USER_DB_FERRET.DBT.MOVING_AVG showing data -->
-<!-- <img width="1710" height="800" alt="MOVING_AVG data in Snowflake" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="2650" height="1634" alt="image" src="https://github.com/user-attachments/assets/2c3f11c3-2a4d-4c81-b92d-7d39b7290d0c" />
 
 ### `DBT.TEMP_ANOMALY` — Verified in Snowflake (436 rows)
 
-<!-- Screenshot: Snowflake — SELECT * FROM USER_DB_FERRET.DBT.TEMP_ANOMALY showing data -->
-<!-- <img width="1710" height="800" alt="TEMP_ANOMALY data in Snowflake" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="2646" height="1662" alt="image" src="https://github.com/user-attachments/assets/b4897f93-59fb-4622-aeb6-427028458730" />
 
-### `DBT.ROLLING_PRECIP` — Verified in Snowflake (432 rows)
+### `DBT.ROLLING_PRECIP` — Verified in Snowflake 
 
-<!-- Screenshot: Snowflake — SELECT * FROM USER_DB_FERRET.DBT.ROLLING_PRECIP showing data -->
-<!-- <img width="1710" height="800" alt="ROLLING_PRECIP data in Snowflake" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="2648" height="1646" alt="image" src="https://github.com/user-attachments/assets/35a85e46-86b1-43ba-a9a5-30916a0ec61d" />
 
-### `DBT.DRY_SPELL` — Verified in Snowflake (432 rows)
+### `DBT.DRY_SPELL` — Verified in Snowflake 
 
-<!-- Screenshot: Snowflake — SELECT * FROM USER_DB_FERRET.DBT.DRY_SPELL showing data -->
-<!-- <img width="1710" height="800" alt="DRY_SPELL data in Snowflake" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="2640" height="1648" alt="image" src="https://github.com/user-attachments/assets/c3eb7072-28a5-408f-906c-8a7977f30784" />
 
 ---
 
@@ -533,8 +543,7 @@ Configure in **Admin → Variables:**
 04:30 UTC  →  WeatherData_DBT     (dbt run → dbt test → dbt snapshot)
 ```
 
-<!-- Screenshot: Airflow DAGs list — all 3 DAGs active with correct schedules -->
-<!-- <img width="1710" height="470" alt="All 3 DAGs in Airflow" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1250" height="428" alt="image" src="https://github.com/user-attachments/assets/a9ca59e8-142a-4696-a108-74ef4ac1da52" />
 
 ---
 
@@ -548,14 +557,13 @@ Configure in **Admin → Variables:**
 
 Preset was connected to Snowflake in 3 steps: select Snowflake as the database type, enter credentials (database: `USER_DB_FERRET`, account: `SFEDU02-EAB27764`, warehouse: `FERRET_QUERY_WH`, role: `TRAINING_ROLE`), and confirm the connection.
 
-<!-- Screenshot: Preset — Step 1 select Snowflake -->
-<!-- <img width="1710" height="800" alt="Preset connect database step 1" src="YOUR_SCREENSHOT_URL" /> -->
 
-<!-- Screenshot: Preset — Step 2 enter Snowflake credentials -->
-<!-- <img width="1710" height="800" alt="Preset enter Snowflake credentials" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1236" height="690" alt="image" src="https://github.com/user-attachments/assets/78a52bc0-975d-427d-85cc-893575ce9272" />
 
-<!-- Screenshot: Preset — Step 3 database connected successfully -->
-<!-- <img width="1710" height="800" alt="Preset database connected" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1236" height="690" alt="image" src="https://github.com/user-attachments/assets/084184ef-cfb0-4160-9198-be75aad0bcb8" />
+
+<img width="1236" height="684" alt="image" src="https://github.com/user-attachments/assets/1a58a1e2-0c3d-41fd-9819-7b6c8edb5c33" />
+
 
 ### Datasets Registered
 
@@ -570,95 +578,85 @@ All four dbt output tables were registered as datasets in Preset:
 
 ### Dashboard — Page 1: Temperature & Dry Spell Insights
 
-<!-- Screenshot: Full dashboard page 1 — showing all 4 charts with City Filter and Date Filter active -->
-<!-- <img width="1710" height="900" alt="Dashboard page 1 full view" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1090" height="596" alt="image" src="https://github.com/user-attachments/assets/84a703c4-7587-470a-b74a-f2367a7e70e0" />
 
-#### Chart 1 — 7-Day Rolling Temperature Trends by City
-**Type:** Line chart | **Source:** `moving_avg`
 
-Shows the 7-day rolling average of `TEMP_MAX` over time for all four cities from February to April 2026. Miami stays consistently warm (25–28°C), Newport Beach holds steady in the low 20s, while Boston climbs from below -5°C in February to 15°C by April. Seattle shows mild progression through spring. The rolling average removes day-to-day noise and makes the seasonal warming trend clearly visible.
-
-<!-- Screenshot: 7-Day Rolling Temperature Trends by City chart -->
-<!-- <img width="1710" height="700" alt="7-Day Rolling Temperature Trends" src="YOUR_SCREENSHOT_URL" /> -->
-
-#### Chart 2 — Maximum Dry Spell Achieved Over Time by City
-**Type:** Line chart | **Source:** `dry_spell`
-
-Tracks the running maximum consecutive dry days per city over the observation period. Newport Beach climbs all the way to **41 consecutive dry days** by early April 2026, reflecting its Southern California climate. Boston, Miami, and Seattle all stay under 15 days. This chart captures drought risk building over time in a way a simple daily counter cannot.
-
-<!-- Screenshot: Maximum Dry Spell Achieved Over Time chart -->
-<!-- <img width="1710" height="700" alt="Maximum Dry Spell chart" src="YOUR_SCREENSHOT_URL" /> -->
-
-#### Chart 3 — City Climate Profile Comparison (Temperature, Rainfall, Wind)
+#### Chart 1 — City Climate Profile Comparison (Temperature, Rainfall, Wind)
 **Type:** Radar / spider chart | **Source:** `temp_anomaly`
 
 Plots `AVG_TEMP_MAX`, `AVG_TEMP_MIN`, `AVG_PRECIPITATION_MM`, and `AVG_WIND_SPEED_MAX_KMH` for all four cities on a single radar chart. Miami clearly dominates on temperature. Newport Beach has the highest wind values. Boston and Seattle cluster inward. This chart lets you compare the full climate fingerprint of all four cities in one glance.
 
-<!-- Screenshot: City Climate Profile Comparison radar chart -->
-<!-- <img width="1710" height="700" alt="City Climate Profile radar chart" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1338" height="800" alt="image" src="https://github.com/user-attachments/assets/6feef695-e8e5-474d-9756-a8163d047dc7" />
 
-#### Chart 4 — City Climate Profile: Avg Max vs Min Temperature with Wind Intensity
+#### Chart 2 — 7-Day Rolling Temperature Trends by City
+**Type:** Line chart | **Source:** `moving_avg`
+
+Shows the 7-day rolling average of `TEMP_MAX` over time for all four cities from February to April 2026. Miami stays consistently warm (25–28°C), Newport Beach holds steady in the low 20s, while Boston climbs from below -5°C in February to 15°C by April. Seattle shows mild progression through spring. The rolling average removes day-to-day noise and makes the seasonal warming trend clearly visible.
+
+<img width="1334" height="766" alt="image" src="https://github.com/user-attachments/assets/8acf3790-39f7-4f14-b073-6139496f5cbd" />
+
+#### Chart 3 — City Climate Profile: Avg Max vs Min Temperature with Wind Intensity
 **Type:** Bubble chart | **Source:** `temp_anomaly`
 
 X-axis is average max temperature, Y-axis is average min temperature, and bubble size encodes wind speed. Miami forms a tight warm cluster in the top-right. Newport Beach spreads across the middle-right. Boston and Seattle cluster in the lower-left. This chart shows both the temperature range experienced by each city and how wind intensity varies across that range.
 
-<!-- Screenshot: City Climate Profile bubble chart -->
-<!-- <img width="1710" height="700" alt="City Climate Profile bubble chart" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1326" height="790" alt="image" src="https://github.com/user-attachments/assets/f7393be8-4756-437f-aeea-3bfd25eca314" />
+
+#### Chart 4 — Maximum Dry Spell Achieved Over Time by City
+**Type:** Line chart | **Source:** `dry_spell`
+
+Tracks the running maximum consecutive dry days per city over the observation period. Newport Beach climbs all the way to **41 consecutive dry days** by early April 2026, reflecting its Southern California climate. Boston, Miami, and Seattle all stay under 15 days. This chart captures drought risk building over time in a way a simple daily counter cannot.
+
+<img width="1230" height="702" alt="image" src="https://github.com/user-attachments/assets/2d5fed87-74bf-4725-917d-3943f7b2ed12" />
 
 ---
 
 ### Dashboard — Page 2: Precipitation & Anomaly Insights
 
-<!-- Screenshot: Full dashboard page 2 — showing all 4 charts with date filter applied -->
-<!-- <img width="1710" height="900" alt="Dashboard page 2 full view" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1100" height="598" alt="image" src="https://github.com/user-attachments/assets/32b1c6cd-b428-44e7-833f-c0f911a4c839" />
+
 
 #### Chart 5 — Avg Temp Comparison by City Current Month
 **Type:** Bar chart (grouped) | **Source:** `moving_avg`
 
 Shows the 7-day rolling average temperature per city grouped by date for the most recent month (April 2026). Miami consistently sits 5–10°C above all other cities. The date-range slider at the bottom allows filtering to any time window, demonstrating the interactive filter capability of the dashboard.
 
-<!-- Screenshot: Avg Temp Comparison by City Current Month bar chart -->
-<!-- <img width="1710" height="700" alt="Avg Temp bar chart" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1230" height="696" alt="image" src="https://github.com/user-attachments/assets/720810bf-9560-4b7c-a923-c8b484738711" />
 
-#### Chart 6 — Average Rainy Days by City
-**Type:** Bar chart | **Source:** `rolling_precip`
-
-Shows the average number of rainy days in the last 7 days per city. Boston (3.31) and Seattle (3.24) lead, confirming their wetter climates, while Newport Beach (0.56) confirms its dry Southern California character. Simple but immediately readable.
-
-<!-- Screenshot: Average Rainy Days by City bar chart -->
-<!-- <img width="1710" height="700" alt="Average Rainy Days bar chart" src="YOUR_SCREENSHOT_URL" /> -->
-
-#### Chart 7 — Temperature Anomaly Heatmap by City
+#### Chart 6 — Temperature Anomaly Heatmap by City
 **Type:** Heatmap | **Source:** `temp_anomaly`
 
 Displays `TEMP_MAX_ANOMALY` per city across the most recent dates. Red cells indicate days warmer than the city's historical average; blue cells indicate cooler days. Boston shows large positive anomalies in early April (20.48°C above average) reflecting a warm spell. Newport Beach stays close to zero — consistent with its mild, stable climate. Filtered by the same date range slider.
 
-<!-- Screenshot: Temperature Anomaly Heatmap by City -->
-<!-- <img width="1710" height="700" alt="Temperature Anomaly Heatmap" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1238" height="672" alt="image" src="https://github.com/user-attachments/assets/81f705b9-5b36-4aa3-b28f-fc9e26e5b7a8" />
+
+#### Chart 7 — Average Rainy Days by City
+**Type:** Bar chart | **Source:** `rolling_precip`
+
+Shows the average number of rainy days in the last 7 days per city. Boston (3.31) and Seattle (3.24) lead, confirming their wetter climates, while Newport Beach (0.56) confirms its dry Southern California character. Simple but immediately readable.
+
+<img width="1326" height="780" alt="image" src="https://github.com/user-attachments/assets/d3314357-9bee-40e9-94bc-e11cd343041c" />
 
 #### Chart 8 — Precipitation vs Temperature Correlation
 **Type:** Scatter chart | **Source:** `rolling_precip`
 
 X-axis is 7-day rolling precipitation, Y-axis is daily max temperature. Each point is a city-day observation. Miami stays high on the Y-axis regardless of precipitation. Boston and Seattle show a slight negative slope — more rain tends to coincide with cooler temperatures. Newport Beach dots cluster near zero precipitation across a wide temperature range.
 
-<!-- Screenshot: Precipitation vs Temperature Correlation scatter chart -->
-<!-- <img width="1710" height="700" alt="Precipitation vs Temperature Correlation" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1328" height="774" alt="image" src="https://github.com/user-attachments/assets/3ad5b6c9-1dc3-4b35-b970-0227fd07ce4f" />
 
 #### Chart 9 — Distribution of Maximum Temperature by City
 **Type:** Box plot | **Source:** `temp_anomaly`
 
 Shows the full temperature distribution (median, IQR, whiskers, outliers) of `TEMP_MAX` for each city. Boston has the widest spread (-13°C to +27°C), reflecting its seasonal variation. Miami is tightly clustered around 24–26°C. Newport Beach shows one high outlier around 32°C. Seattle is narrow and mild.
 
-<!-- Screenshot: Distribution of Maximum Temperature box plot -->
-<!-- <img width="1710" height="700" alt="Distribution of Maximum Temperature box plot" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1234" height="680" alt="image" src="https://github.com/user-attachments/assets/7c547ce3-4fab-40a1-acf2-a22bb0842cbd" />
 
 #### Chart 10 — Monthly Rainfall & Temperature Comparison by City
 **Type:** Pivot table with heatmap coloring | **Source:** `rolling_precip`
 
 A pivot table showing `AVG(PRECIPITATION_MM)` and `AVG(TEMP_MAX)` per city per month (Jan–Apr 2026). Green shading highlights high precipitation; red shading highlights high temperature. Newport Beach records near-zero precipitation every month (0.03–0.98mm average) while Boston and Seattle are consistently greener. Temperatures warm visibly from January through April for Boston and Seattle.
 
-<!-- Screenshot: Monthly Rainfall & Temperature Comparison pivot table -->
-<!-- <img width="1710" height="700" alt="Monthly Rainfall & Temperature pivot table" src="YOUR_SCREENSHOT_URL" /> -->
+<img width="1232" height="672" alt="image" src="https://github.com/user-attachments/assets/4e7411d7-1c46-42f0-a669-df87ab2f2d5a" />
 
 ---
 
