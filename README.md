@@ -6,8 +6,12 @@
 
 ## Table of Contents
 - [Overview](#overview)
+- [Problem Statement](#problem-statement)
+- [Solution Requirements](#solution-requirements)
+- [Functional Analysis](#functional-analysis)
 - [Tech Stack](#tech-stack)
 - [System Architecture](#system-architecture)
+- [Table Structures](#table-structures)
 - [Cities Tracked](#cities-tracked)
 - [Project Structure](#project-structure)
 - [Pipeline Details](#pipeline-details)
@@ -17,6 +21,7 @@
 - [dbt Models](#dbt-models)
 - [dbt Tests & Snapshot](#dbt-tests--snapshot)
 - [Snowflake Schema & Tables](#snowflake-schema--tables)
+- [How to Run](#how-to-run)
 - [Airflow Setup](#airflow-setup)
 - [Preset Dashboard](#preset-dashboard)
 - [Lessons Learned](#lessons-learned)
@@ -38,6 +43,59 @@ Three DAGs handle the three stages of work in sequence:
 
 ---
 
+## Problem Statement
+
+This project builds an automated weather analytics system to ingest, process, and analyze historical and forecast weather data.
+
+Manual data collection and fragmented analysis limit scalability and consistency. A centralized data warehouse (Snowflake) is required to store structured data, while automated data pipelines (Airflow + dbt) ensure reliable ingestion, transformation, and analytics.
+
+This system enables repeatable, scalable, and production-ready data workflows.
+
+---
+
+## Solution Requirements
+
+### Functional Requirements
+- Ingest 60 days of weather data from Open-Meteo API
+- Store structured data in Snowflake
+- Run ML forecasting for future predictions
+- Transform data using dbt models
+- Visualize insights using dashboards
+
+### System Usage
+- Data engineers monitor pipelines via Airflow UI
+- Users access insights through Preset dashboards
+
+### Limitations
+- Limited to selected cities
+- Batch processing (not real-time)
+- Forecast accuracy depends on historical data quality
+
+---  
+
+## Functional Analysis
+
+The system consists of three main pipelines:
+
+1. ETL Pipeline (WeatherData_ETL)
+   - Extracts data from Open-Meteo API
+   - Loads into Snowflake RAW schema
+
+2. ML Forecast Pipeline (TrainPredict)
+   - Trains Snowflake ML Forecast model
+   - Generates 7-day predictions
+
+3. dbt ELT Pipeline (WeatherData_DBT)
+   - Transforms raw data into analytical models
+   - Applies tests and snapshots
+
+### Pipeline Flow
+ETL → ML → dbt → Dashboard
+
+Forecast and historical data are combined using UNION ALL to create the final analytics table.
+
+---
+
 ## Tech Stack
 
 - Orchestration: Apache Airflow
@@ -55,6 +113,38 @@ Three DAGs handle the three stages of work in sequence:
 
 > **Architecture Overview:**
 > Open-Meteo API → Airflow ETL (4 parallel city pipelines) → Snowflake RAW.CITY_WEATHER → Airflow ML Forecast (TrainPredict) → Snowflake ANALYTICS (FINAL + METRICS) → Airflow dbt ELT (models, tests, snapshot) → Snowflake DBT Schema → Preset Dashboard
+
+---
+
+## Table Structures
+
+### RAW.CITY_WEATHER
+
+| Column | Type | Description |
+|--------|------|------------|
+| CITY | STRING | City name |
+| DATE | DATE | Observation date |
+| TEMP_MAX | FLOAT | Max temperature |
+| TEMP_MIN | FLOAT | Min temperature |
+| PRECIPITATION | FLOAT | Rainfall |
+| WIND_SPEED | FLOAT | Wind speed |
+| WEATHER_CODE | INT | Weather condition |
+
+Primary Key: (CITY, DATE)
+
+---
+
+### ANALYTICS.CITY_WEATHER_FINAL
+
+| Column | Type | Description |
+|--------|------|------------|
+| CITY | STRING |
+| DATE | DATE |
+| ACTUAL | FLOAT |
+| FORECAST | FLOAT |
+| LOWER_BOUND | FLOAT |
+| UPPER_BOUND | FLOAT |
+
 ---
 
 ## Cities Tracked
@@ -514,6 +604,15 @@ USER_DB_FERRET
 ### `DBT.DRY_SPELL` — Verified in Snowflake 
 
 <img width="2640" height="1648" alt="image" src="https://github.com/user-attachments/assets/c3eb7072-28a5-408f-906c-8a7977f30784" />
+
+---
+
+## How to Run
+
+### Start System
+
+docker-compose up airflow-init
+docker-compose up -d
 
 ---
 
