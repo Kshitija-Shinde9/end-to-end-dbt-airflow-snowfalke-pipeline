@@ -612,6 +612,7 @@ USER_DB_FERRET
 ### Start System
 
 docker-compose up airflow-init
+
 docker-compose up -d
 
 ---
