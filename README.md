@@ -36,6 +36,16 @@ Three DAGs handle the three stages of work in sequence:
 
 ---
 
+## Tech Stack
+
+- Orchestration: Apache Airflow
+- Data Warehouse: Snowflake
+- Transformation: dbt
+- Machine Learning: Snowflake ML Forecast
+- Visualization: Preset (Apache Superset)
+- Programming: Python, SQL
+- Infrastructure: Docker
+
 ## System Architecture
 
 
