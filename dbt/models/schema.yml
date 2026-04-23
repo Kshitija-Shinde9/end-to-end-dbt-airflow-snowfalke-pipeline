@@ -1,0 +1,124 @@
+version: 2
+
+models:
+  - name: moving_avg
+    description: >
+      7-day rolling averages of TEMP_MAX, TEMP_MIN, and TEMP_MEAN for each city.
+      Smooths daily fluctuations to reveal underlying temperature trends.
+    columns:
+      - name: city
+        description: "Name of the city"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Newport Beach', 'Boston', 'Seattle', 'Miami']
+      - name: date
+        description: "Observation date"
+        tests:
+          - not_null
+      - name: temp_max
+        description: "Daily maximum temperature in Celsius"
+        tests:
+          - not_null
+      - name: temp_max_7day_avg
+        description: "7-day rolling average of TEMP_MAX"
+        tests:
+          - not_null
+      - name: temp_min_7day_avg
+        description: "7-day rolling average of TEMP_MIN"
+        tests:
+          - not_null
+      - name: temp_mean_7day_avg
+        description: "7-day rolling average of TEMP_MEAN"
+        tests:
+          - not_null
+
+  - name: temp_anomaly
+    description: >
+      Temperature anomaly per city per day. Measures how much warmer or cooler
+      a day was compared to the city's historical average TEMP_MAX.
+    columns:
+      - name: city
+        description: "Name of the city"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Newport Beach', 'Boston', 'Seattle', 'Miami']
+      - name: date
+        description: "Observation date"
+        tests:
+          - not_null
+      - name: temp_max
+        description: "Daily maximum temperature in Celsius"
+        tests:
+          - not_null
+      - name: temp_max_anomaly
+        description: "Difference between TEMP_MAX and the city average TEMP_MAX"
+        tests:
+          - not_null
+      - name: anomaly_category
+        description: "Categorical label: Above Normal, Below Normal, or Near Normal"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Above Normal', 'Below Normal', 'Near Normal']
+
+  - name: rolling_precip
+    description: >
+      7-day and 30-day rolling precipitation totals and rain day counts per city.
+      Identifies wet vs dry periods over time.
+    columns:
+      - name: city
+        description: "Name of the city"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Newport Beach', 'Boston', 'Seattle', 'Miami']
+      - name: date
+        description: "Observation date"
+        tests:
+          - not_null
+      - name: precipitation_mm
+        description: "Daily precipitation in mm"
+        tests:
+          - not_null
+      - name: precip_7day_rolling_sum
+        description: "7-day rolling sum of precipitation"
+        tests:
+          - not_null
+      - name: period_label
+        description: "Wet Period, Dry Period, or Normal Period based on 7-day rolling sum"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Wet Period', 'Dry Period', 'Normal Period']
+
+  - name: dry_spell
+    description: >
+      Consecutive dry day counter per city. Resets to 0 on rain days.
+      Identifies drought-like conditions and long dry spells.
+    columns:
+      - name: city
+        description: "Name of the city"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Newport Beach', 'Boston', 'Seattle', 'Miami']
+      - name: date
+        description: "Observation date"
+        tests:
+          - not_null
+      - name: precipitation_mm
+        description: "Daily precipitation in mm"
+        tests:
+          - not_null
+      - name: dry_spell_days
+        description: "Number of consecutive dry days up to and including this date"
+        tests:
+          - not_null
+      - name: dry_spell_label
+        description: "Human-readable dry spell category"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Rain Day', 'Extended Dry Spell (7+ days)', 'Short Dry Spell (3-6 days)', 'Dry (1-2 days)']
