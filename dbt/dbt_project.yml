@@ -1,0 +1,21 @@
+name: 'weather_analytics'
+version: '1.0.0'
+config-version: 2
+
+profile: 'weather_analytics'
+
+model-paths: ["models"]
+snapshot-paths: ["snapshots"]
+test-paths: ["tests"]
+analysis-paths: ["analyses"]
+macro-paths: ["macros"]
+seed-paths: ["seeds"]
+log-path: "logs"
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  weather_analytics:
+    +materialized: table
