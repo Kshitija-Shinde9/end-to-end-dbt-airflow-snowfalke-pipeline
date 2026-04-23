@@ -9,6 +9,7 @@
 - [System Architecture](#system-architecture)
 - [Cities Tracked](#cities-tracked)
 - [Project Structure](#project-structure)
+- [Pipeline Details](#pipeline-details)
 - [Pipeline 1 — Weather ETL DAG](#pipeline-1--weather-etl-dag)
 - [Pipeline 2 — TrainPredict DAG](#pipeline-2--trainpredict-dag)
 - [Pipeline 3 — WeatherData DBT DAG](#pipeline-3--weatherdata-dbt-dag)
