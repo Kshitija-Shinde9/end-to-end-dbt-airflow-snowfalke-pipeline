@@ -569,12 +569,12 @@ Preset was connected to Snowflake in 3 steps: select Snowflake as the database t
 
 All four dbt output tables were registered as datasets in Preset:
 
-| Dataset | Source Table | Rows |
-|---------|-------------|------|
-| `moving_avg` | `DBT.MOVING_AVG` | 436 |
-| `temp_anomaly` | `DBT.TEMP_ANOMALY` | 436 |
-| `rolling_precip` | `DBT.ROLLING_PRECIP` | 432 |
-| `dry_spell` | `DBT.DRY_SPELL` | 432 |
+| Dataset | Source Table |
+|---------|-------------|
+| `moving_avg` | `DBT.MOVING_AVG` | 
+| `temp_anomaly` | `DBT.TEMP_ANOMALY` | 
+| `rolling_precip` | `DBT.ROLLING_PRECIP` | 
+| `dry_spell` | `DBT.DRY_SPELL` | 
 
 ### Dashboard — Page 1: Temperature & Dry Spell Insights
 
