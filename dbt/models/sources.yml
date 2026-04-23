@@ -1,0 +1,30 @@
+version: 2
+
+sources:
+  - name: raw
+    database: USER_DB_FERRET
+    schema: RAW
+    tables:
+      - name: city_weather
+        description: "Raw daily weather observations for all cities ingested by the Airflow ETL pipeline."
+        columns:
+          - name: city
+            description: "Name of the city"
+            tests:
+              - not_null
+          - name: date
+            description: "Observation date"
+            tests:
+              - not_null
+          - name: temp_max
+            description: "Daily maximum temperature in Celsius"
+          - name: temp_min
+            description: "Daily minimum temperature in Celsius"
+          - name: temp_mean
+            description: "Daily mean temperature in Celsius"
+          - name: precipitation_mm
+            description: "Total daily precipitation in mm"
+          - name: wind_speed_max_kmh
+            description: "Maximum daily wind speed in km/h"
+          - name: weather_code
+            description: "WMO weather code"
