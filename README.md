@@ -560,9 +560,12 @@ Preset was connected to Snowflake in 3 steps: select Snowflake as the database t
 
 <img width="1236" height="690" alt="image" src="https://github.com/user-attachments/assets/78a52bc0-975d-427d-85cc-893575ce9272" />
 
+
 <img width="1236" height="690" alt="image" src="https://github.com/user-attachments/assets/084184ef-cfb0-4160-9198-be75aad0bcb8" />
 
+
 <img width="1236" height="684" alt="image" src="https://github.com/user-attachments/assets/1a58a1e2-0c3d-41fd-9819-7b6c8edb5c33" />
+
 
 
 ### Datasets Registered
