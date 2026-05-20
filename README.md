@@ -138,8 +138,8 @@ Primary Key: (CITY, DATE)
 
 ### ANALYTICS.CITY_WEATHER_FINAL
 
-| Column | Type | Description |
-|--------|------|------------|
+| Column | Type |
+|--------|------|
 | CITY | STRING |
 | DATE | DATE |
 | ACTUAL | FLOAT |
