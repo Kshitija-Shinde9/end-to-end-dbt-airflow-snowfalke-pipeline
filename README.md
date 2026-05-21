@@ -1,4 +1,4 @@
-# Weather Analytics Lab 2 — End-to-End ELT Pipeline
+# Weather Analytics — End-to-End ELT Pipeline
 
 ### Powered by · Snowflake · Apache Airflow · dbt · Preset · Open-Meteo API · ML Forecasting
 
